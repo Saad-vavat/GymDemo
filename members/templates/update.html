@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block content %}
+<div class="pagetitle">
+  <h1>Membership Info</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active">Membership Info</li>
+    </ol>
+  </nav>
+</div>
+{% if messages %}
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="addTaskTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container text-center">
+          <div class="messages">
+            {% for message in messages %}
+            {% if message.tags == "error" %}
+            <div class="alert alert-dark"></div>
+            {% else %}
+            <div class="alert alert-{{ message.tags }} " id=""></div>
+            {% endif %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="row">
+  <div class="text-end">
+    <button class="btn btn-secondary text-end btn-sm " onclick="goBack()">Back</button>
+    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+      Delete Account
+    </button>
+  </div>
+</div>
+
+<div class="card-body">
+  <!-- Vertically centered Modal -->
+
+  <div class="modal fade" id="verticalycentered" tabindex="-1" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Do you Want To Delete?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-sm"><a href="{% url 'delete_member' user.member_id %}"
+              class="text-white">Delete
+              Account</a></button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- End Vertically centered Modal-->
+
+</div>
+
+<div class="container bg-white p-4 shadow" style="margin-top: 3%">
+  <div class="row">
+    <div class="col-md-3 text-center">
+      {% if user.photo %}
+      <img src="{{ user.photo.url }}" class="img-fluid">
+      {% else %}
+      <img src="/media/download.jpg" class="img-fluid">
+      {% endif %}
+
+      <div class="pt-3">
+        <h5 class="text-center text-dark" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
+          {{ user.first_name }} {{ user.last_name }}</h5>
+
+        <h6 class="text-muted text-center">{{ user.address }}</h6>
+      </div>
+
+      <div class="pt-2">
+        <h6 class="text-center text-dark">Member Since</h6>
+        <div class="text-center alert alert-success">{{ user.admitted_on }}</div>
+      </div>
+
+      <div class="text-center">
+        <table class="table">
+          <tr>
+            <th>DOB</th>
+            <td>{{ user.dob }}</td>
+          </tr>
+        </table>
+      </div>
+
+
+      <div class="text-center">
+        <table class="table">
+          <tr>
+            <th>Mobile</th>
+            <td> {{ user.mobile_number }}</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+    <div class="col">
+      {% if updated %}
+      <div class="alert alert-success">
+        {{ updated }}
+      </div>
+      {% endif %}
+      {% if gym_form.errors %}
+      {% for field in gym_form %}
+      {% for error in field.errors %}
+      <div class="alert alert-danger">
+        {{ error|escape }}
+      </div>
+      {% endfor %}
+      {% endfor %}
+      {% for error in gym_form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ error|escape }}
+      </div>
+      {% endfor %}
+      {% endif %}
+      <h5 class="text-white p-2 " style="background-color:#304c64;">MEMBERSHIP&nbsp;INFORMATION</h5>
+      <form method="POST" action="{% url 'update_member' user.member_id %}" style="margin-top: 2%"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="subscription_type">{{ gym_form.subscription_type.label }}</label>
+            {{ gym_form.subscription_type | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="subscription_period">{{ gym_form.subscription_period.label }}</label>
+            {{ gym_form.subscription_period | add_css:"form-select form-select-sm" }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="registration_upto">Registration Date</label>
+            {{ gym_form.registration_date | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="registration_upto">{{ gym_form.registration_upto.label }}</label>
+            {{ gym_form.registration_upto | add_css:"form-control form-control-sm" }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="amount">{{ gym_form.amount.label }}</label>
+            {{ gym_form.amount | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="photo">{{ gym_form.fee_status.label }}</label>
+            {{ gym_form.fee_status | add_css:"form-select form-select-sm" }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-form-label-sm fw-semibold col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <label for="batch">{{ gym_form.batch.label }}</label>
+            {{ gym_form.batch | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <label for="stop">{{ gym_form.stop.label }}</label>
+            {{ gym_form.stop | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-3 col-md-3 col-sm-12 col-xs-12 pt-3">
+            <input type="submit" class="btn btn-warning btn-sm" name="gym_membership" value="Update">
+          </div>
+          <div class="form-group col-form-label-sm fw-semibold col-lg-3 col-md-3 col-sm-12 col-xs-12 pt-3">
+
+          </div>
+        </div>
+      </form>
+
+      <div class="pt-3">
+        <h5 class="text-white p-2 " style="background-color:#304c64;">PERSONAL&nbsp;INFORMATION</h5>
+      </div>
+      <form method="POST" action="{% url 'update_member' user.member_id %}" style="margin-top: 2%"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="form-group col">
+            <label for="first_name" class="col-form-label-sm fw-bold">{{ info_form.first_name.label }}</label>
+            {{ info_form.first_name | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col">
+            <label for="last_name" class="col-form-label-sm fw-bold">{{ info_form.last_name.label }}</label>
+            {{ info_form.last_name | add_css:"form-control form-control-sm" }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <label for="dob" class="col-form-label-sm fw-bold">{{ info_form.dob.label }}</label>
+            {{ info_form.dob | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <label for="photo" class="col-form-label-sm fw-bold">{{ info_form.photo.label }}</label>
+            {{ info_form.photo | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 pt-4">
+            <input type="submit" class="btn btn-warning btn-sm" name="info" value="Update Info" />
+            <input type="submit" class="btn btn-danger  btn-sm" name="export" value="Export Data" />
+          </div>
+        </div>
+      </form>
+
+      <div class="row  pt-4">
+        <div class="col">
+          <h5 class="text-white p-2 " style=" background-color:#304c64;">PAYMENT&nbsp;DETAILS</h5>
+        </div>
+      </div>
+
+      {% if payments != 'No Records' %}
+      <table class="table table-sm table-hover table-bordered table-info">
+        <thead class="text-center thead-dark">
+          <tr style="font-size: 14px;">
+            <th scope="col">Payment Date</th>
+            <th scope="col">Paid For</th>
+            <th scope="col">Amount Paid</th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          {% for pays in payments %}
+          <tr style="font-size: 14px;">
+            <td>{{ pays.payment_date }}</td>
+            <td>{{ pays.payment_period }} Months</td>
+            <td>{{ pays.payment_amount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="row text-center">
+        <div class="alert alert-warning col"> <strong>{{ payments }}</strong> </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  function goBack() {
+    if ($("#alertbox").html != "") {
+      window.close();
+      window.location.replace("{% url 'search_member' %}");
+    }
+    else {
+      window.close();
+      window.history.back();
+    }
+
+  }
+
+  $(window).on('load', function () {
+    $('#modal').modal('show');
+  });
+</script>
+{% endblock %}

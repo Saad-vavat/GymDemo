@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block content %}
+<!-- <a href="{% url 'export_all' %}">Export all users</a> -->
+<form method="POST" action="{% url 'reports' %}" style="margin-top: 3%; margin-bottom: 3%">
+    {% csrf_token %}
+    <div class="row container bg-white shadow p-3">
+        <div class="col-12 col-md-4">
+            <label for="month" class="form-label col-form-label-sm fw-semibold text-dark">{{ form.month.label }}</label>
+            {{ form.month | add_css:"form-select form-select-sm" }}
+        </div>
+        <div class="col-12 col-md-4">
+            <label for="year" class="form-label col-form-label-sm fw-semibold text-dark">{{ form.year.label }}</label>
+            {{ form.year | add_css:"form-select form-select-sm" }}
+        </div>
+        <div class="col-12 col-md-4">
+            <label for="batch" class="form-label col-form-label-sm fw-semibold text-dark">{{ form.batch.label }}</label>
+            {{ form.batch | add_css:"form-select form-select-sm" }}
+        </div>
+        <div class="row" style="margin-top: 3%">
+            <div class="col-md-8 col-12">
+                <button type="submit" id="submit" class="btn btn-danger btn-sm text-start">Generate Report</button>
+            </div>
+            <div class="col-12 col-md-4 text-end">
+                <button type="submit" id="export" name="export" class="btn btn-success btn-sm text-end">
+                    <i class="bi bi-file-earmark-excel"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+{% if students_registered %}
+<div style="margin-top: 3%">
+    <div class="row">
+        {% if aggregate_amount %}
+        <div class="col">
+            <div class="alert alert-success">
+                Total Amount Collected during this period: {{ aggregate_amount }}
+            </div>
+        </div>
+        {% endif %}
+        <div class="col">
+            <div class="alert alert-success">
+                Total Students Admitted during this period: {{ students_registered }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if users %}
+<div class="container table table-responsive" style="margin-top: 3%">
+    <table class="table table-hover table-sm" style="background-color: #F2F2F2">
+        <thead class="thead-dark text-center">
+            <tr class="text-white" style=" background-color:#304c64;font-size: 14px;">
+                <th scope="col">ID</td>
+                <td scope="col">Name</td>
+                <td scope="col">DOB</td>
+                <td scope="col">Registration&nbsp;Date</td>
+                <td scope="col">Registration&nbsp;Upto</td>
+                <td scope="col">Subscription&nbsp;Type</td>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            {% for member in users %}
+            <tr style="font-size: 14px;">
+                <th scope="row">{{ forloop.counter }}</th>
+                <td><a href="/members/update/{{ member.member_id }}" class="text-danger fw-bold">
+                        {{ member.first_name }} {{member.last_name }}</a>
+                </td>
+                <td>{{ member.dob }}</td>
+                <td>{{ member.registration_date }}</td>
+                <td>{{ member.registration_upto }}</td>
+                <td>{{ member.get_subscription_type_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

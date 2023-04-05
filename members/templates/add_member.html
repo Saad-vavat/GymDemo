@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block title %}
+Members
+{% endblock %}
+
+{% block content %}
+
+<div class="pagetitle">
+  <h1>Admission</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active">Admission</li>
+    </ol>
+  </nav>
+</div>
+<style type="text/css">
+  .req {
+    text-decoration: none;
+    color: red;
+  }
+</style>
+<div class="container" style="margin-top: 3%; margin-bottom: 3%">
+  {% if add_success %}
+  <!-- Modal -->
+  <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="addTaskTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="container text-center">
+            <div class="alert alert-dark" style="margin-bottom: 0">
+              <p style="margin-bottom: 0">{{ add_success }}</p>
+              <form method="POST" action="{% url 'update_member' member.member_id %}">
+                {% csrf_token %}
+                <div>Want to print user data?</div>
+                <input type="submit" class="btn btn-success btn-sm" name="export" value="Yes" />
+                <input type="submit" class="btn btn-danger btn-sm" name="no" value="No" />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if form.errors %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  <div class="alert alert-danger">
+    {{ error|escape }}
+  </div>
+  {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+  <div class="alert alert-danger">
+    {{ error|escape }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  <form method="POST" action="{% url 'add_member' %}" enctype="multipart/form-data" class="bg-white shadow rounded p-3">
+    {% csrf_token %}
+    <div class="row ">
+      <div class="col-md-3 mb-2">
+        <div class="text-center">
+          <img src="/media/download.jpg" class="img-fluid">
+        </div>
+        <div class="form-group" style="padding-top: 10px;">
+          <label for="photo" class="form-label col-form-label-sm fw-semibold">Upload Photo:</label>
+          {{ form.photo | add_css:"form-control form-control-sm mb-2" }}
+        </div>
+        <div class="form-group ">
+          <label for="photo" class="form-label col-form-label-sm fw-semibold">DOB:<span class="req "> *</span></label>
+          {{ form.dob | add_css:"form-control form-control-sm" }}
+        </div>
+
+      </div>
+      <div class="col-md-9">
+        <div class="row mb-2">
+          <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="first_name" class="form-label col-form-label-sm fw-semibold">{{ form.first_name.label }}<span
+                class="req">
+                *</span></label>
+            {{ form.first_name | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="last_name" class="form-label col-form-label-sm fw-semibold">{{ form.last_name.label }}<span
+                class="req">
+                *</span></label>
+            {{ form.last_name | add_css:"form-control form-control-sm" }}
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="mobile_number" class="form-label col-form-label-sm fw-semibold">
+              {{ form.mobile_number.label}}<span class="req"> *</span></label>
+            {{ form.mobile_number | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="email" class="form-label col-form-label-sm fw-semibold">{{ form.email.label }}</label>
+            {{ form.email | add_css:"form-control form-control-sm" }}
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col form-group">
+            <label for="address" class="form-label col-form-label-sm fw-semibold">{{ form.address.label }}</label>
+            {{ form.address | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="col form-group">
+            <label for="address" class="form-label col-form-label-sm fw-semibold">
+              {{ form.medical_history.label}}</label>
+            {{ form.medical_history | add_css:"form-control form-control-sm" }}
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <label for="subscription_type" class="form-label col-form-label-sm fw-semibold">
+              {{form.subscription_type.label }}<span class="req"> *</span></label>
+            {{ form.subscription_type | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <label for="subscription_period" class="form-label col-form-label-sm fw-semibold">
+              {{form.subscription_period.label}}<span class="req"> *</span></label>
+            {{ form.subscription_period | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12 fw-semibold">
+            <label for="amount" class="form-label col-form-label-sm">{{ form.amount.label }}<span class="req">
+                *</span></label>
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend input-group-sm fw-semibold">
+                <span class="input-group-text ">₹</span>
+              </div>
+              {{ form.amount | add_css:"form-control form-control-sm" }}
+            </div>
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <label for="fee_status" class="form-label col-form-label-sm fw-semibold">{{ form.fee_status.label }}<span
+                class="req">
+                *</span></label>
+            {{ form.fee_status | add_css:"form-select form-select-sm"}}
+          </div>
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <label for="registration_date" class="form-label col-form-label-sm fw-semibold">
+              {{form.registration_date.label }}<span class="req"> *</span></label>
+            {{ form.registration_date | add_css:"form-control form-control-sm" }}
+          </div>
+          <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <label for="batch" class="form-label col-form-label-sm fw-semibold">{{ form.batch.label }}<span class="req">
+                *</span></label>
+            {{ form.batch | add_css:"form-select form-select-sm" }}
+          </div>
+          <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-primary btn-sm btn-block">Add</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  $(window).on('load', function () {
+    $('#modal').modal('show');
+  });
+
+  document.getElementsByName("first_name")[0].focus()
+</script>
+{% endblock %}
